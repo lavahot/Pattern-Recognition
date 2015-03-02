@@ -3,18 +3,37 @@ import sympy
 from numpy import linalg
 import copy, math
 from matplotlib import pyplot
-pyplot.rcParams['savefig.dpi'] = 128
 
+
+part = 1
+subPart = 'a'
 
 # Test Paramters
-A_SAMPLES_FNAME = '2-1.txt'
-B_SAMPLES_FNAME = '2-2.txt'
 A_MU = [1.0, 1.0]
-A_SIGM = [1.0, 1.0]
-A_PRIOR = 0.3
 B_MU = [4.0, 4.0]
-B_SIGM = [math.sqrt(4.0), math.sqrt(5.0)]
-B_PRIOR = 0.7
+
+if part == 1:
+	A_SAMPLES_FNAME = '1-1.txt'
+	B_SAMPLES_FNAME = '1-2.txt'
+	A_SIGM = [1.0, 1.0]
+	B_SIGM = [math.sqrt(1.0), math.sqrt(1.0)]
+elif part == 2:
+	A_SAMPLES_FNAME = '2-1.txt'
+	B_SAMPLES_FNAME = '2-2.txt'
+	B_MU = [4.0, 4.0]
+	B_SIGM = [math.sqrt(4.0), math.sqrt(16.0)]
+else:
+	raise Exception('Unknown part')
+
+
+if subPart == 'a':
+	A_PRIOR = 0.5
+	B_PRIOR = 0.5
+elif subPart == 'b':
+	A_PRIOR = 0.3
+	B_PRIOR = 0.7	
+else:
+	raise Exception('Unknown subpart')
 
 
 # Distribution
@@ -109,7 +128,7 @@ pyplot.show()
 
 
 # Get Bounds
-linspace = np.linspace(-4, 12, 5000)
+linspace = np.linspace(-4, 12, 1000)
 bounds = getBounds(A, B, linspace)
 print(A.getLogProbFormula())
 print(B.getLogProbFormula())
