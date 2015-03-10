@@ -25,8 +25,11 @@ def getPixels(img, mask):
 	''' Returns an array of rgb pixels in the form (sample, RGB components).
 	Keyword arguments:
 	img -- A numpy array which holds the image.
-	mask -- A numpy array in which values non-zero values are kept.
+	mask -- A numpy array in which values non-zero values are kept. If no mask is desired, use None.
 	'''
+	# Handle no mask situation
+	if mask == None:
+		mask = np.ones(img.shape[:2])
 	# Convert image to vector of pixels
 	if len(mask.shape) > 2:
 		mask = rgbToGray(mask)
