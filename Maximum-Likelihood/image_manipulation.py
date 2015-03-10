@@ -22,7 +22,7 @@ def rgbToGray(img):
 	return gray
 
 def getPixels(img, mask):
-	''' Returns an array of rgb pixels.
+	''' Returns an array of rgb pixels in the form (sample, RGB components).
 	Keyword arguments:
 	img -- A numpy array which holds the image.
 	mask -- A numpy array in which values non-zero values are kept.
@@ -47,9 +47,9 @@ def getPixels(img, mask):
 	return pixels
 
 def RGBPixelsToYCbCr(pixels):
-	''' Returns an array of YCbCr pixels.
+	''' Returns an array of YCbCr pixels in the form (sample, YCbCr components).
 	Keyword arguments:
-	pixels -- An array of RGB pixels.
+	pixels -- An array of RGB pixels in the form (sample, RGB components).
 	'''
 	new_pixels = pixels.copy()
 	R, G, B = pixels[:, 0], pixels[:, 1], pixels[:, 2]
