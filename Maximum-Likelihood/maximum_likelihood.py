@@ -9,7 +9,7 @@ def getMaximumLikelihood(training):
 	training -- An numpy array of features. It should be in the form (sample, feature)
 	'''
 	training = np.array(training)
-	if training.shape != 2:
+	if len(training.shape) != 2:
 		raise Exception('Training data must be an array of vectors.')
 	d = training.shape[1]
 	mu = []
