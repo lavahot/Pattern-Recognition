@@ -28,6 +28,24 @@ class Distribution:
 		p_bas = -1.0 * math.log(((2.0 * math.pi) ** (self.d/2.0)) * (linalg.det(self.covar)** (self.d/2)))
 		p_pri = math.log(self.prior)
 		return p_exp + p_bas + p_pri
+	def getLogProbs(self, X):
+		''' Returns ln(P(x)), in which P(x) is the likelihood of belonging to this distribution.
+		Keyword arguments:
+		X -- Array of vectors to analyze of shape (sample, feature).
+		'''
+		if len(X.shape) != 2:
+			raise Exception('X must be an array of vectors. (2d matrix)')
+		if X.shape[1] != self.d:
+			raise Exception('X must have the same number of rows as dimensions in the distribution.')
+		X = X.transpose().copy()
+		for i in range(self.d):
+			X[i] -= self.mu[i]
+		p = np.dot(linalg.inv(self.covar), X)
+		p *= X
+		p *= -0.5
+		p = p[0] + p[1]
+		p += -math.log(((2.0 * math.pi) ** (self.d/2.0)) * linalg.det(self.covar) ** (self.d/2)) + math.log(self.prior)
+		return p
 	def __str__(self):
 		return 'mu={mu}, covar={covar}, prior={prior}'.format(mu=self.mu,
 		                                                      covar=self.covar,
