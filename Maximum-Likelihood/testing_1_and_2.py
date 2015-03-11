@@ -71,8 +71,8 @@ print(results)
 print('Total Error:', 1.0 - np.trace(results)/np.sum(results))
 # Visual representation
 plt.title('Confusion Matrix')
-plt.xlabel('Actual Class')
-plt.ylabel('Predicted Class')
+plt.xlabel('Predicted Class')
+plt.ylabel('Actual Class')
 plt.imshow(results, cmap='gray', interpolation='nearest', clim=[0, 10000])
 plt.show()
 
