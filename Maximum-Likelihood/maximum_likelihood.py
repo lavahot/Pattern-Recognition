@@ -15,6 +15,7 @@ def getMaximumLikelihood(training):
 	mu = []
 	for i in range(d):
 		mu.append(training[:, i].mean())
+		training[:, i] -= mu[-1]
 	covar = np.dot(training.transpose(), training)
 	covar /= float(d)
 	return Distribution(mu=mu, covar=covar)
