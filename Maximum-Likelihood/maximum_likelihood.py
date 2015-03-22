@@ -11,11 +11,12 @@ def getMaximumLikelihood(training):
 	training = np.array(training)
 	if len(training.shape) != 2:
 		raise Exception('Training data must be an array of vectors.')
+	n = training.shape[0]
 	d = training.shape[1]
 	mu = []
 	for i in range(d):
 		mu.append(training[:, i].mean())
 		training[:, i] -= mu[-1]
 	covar = np.dot(training.transpose(), training)
-	covar /= float(d)
+	covar /= float(n)
 	return Distribution(mu=mu, covar=covar)
