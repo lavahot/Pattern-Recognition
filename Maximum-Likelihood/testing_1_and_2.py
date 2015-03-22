@@ -1,16 +1,23 @@
-# Part can be either 1 or 2
-PART = 1
-# Subpart can be either a or b
-SUBPART = 'a'
 
+# coding: utf-8
+
+# In[1]:
 
 from matplotlib import pyplot as plt
 import numpy as np
+
+
+# In[2]:
 
 from bayes_classifier import *
 from image_manipulation import *
 from maximum_likelihood import *
 
+
+# In[3]:
+
+PART = 1
+SUBPART = 'a'
 
 
 # In[4]:
