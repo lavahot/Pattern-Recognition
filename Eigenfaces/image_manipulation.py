@@ -64,10 +64,10 @@ def devectorizeImage(x, width, height):
 	img - 2D or 3D numpy array
 		A grayscale or color version of the image represented by vector x.
 	"""
-	totSize = np.prod(img.shape)
+	totSize = np.prod(x.shape)
 	nChannels = totSize / (width * height)
 	if nChannels == 1:
-		return img.reshape((height, width)).copy()
+		return x.reshape((height, width)).copy()
 	else:
-		return img.reshape((height, width, nChannels)).copy()
+		return x.reshape((height, width, nChannels)).copy()
 
