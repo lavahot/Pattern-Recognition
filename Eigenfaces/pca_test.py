@@ -28,3 +28,9 @@ meanFace = devectorizeImage(pca.meanVect, w, h)
 plt.title('Mean Face')
 plt.imshow(meanFace)
 plt.show()
+
+# Test first eigenface
+eigenFace = devectorizeImage(pca.eigenVects[:, 0], w, h)
+plt.title('Eigen Face')
+plt.imshow(eigenFace)
+plt.show()
