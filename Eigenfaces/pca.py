@@ -53,6 +53,23 @@ class Pca:
 			Reconstruction based on y.
 		"""
 		pass
+	def getMahalanobisDist(self, x1, x2):
+		"""Find the mahalanobis distance between x1 and x2 in the pca space.
+		Parameters
+		----------
+		x1 - Numpy vector/array
+			Point to compare against.
+		x2 - Numpy vector/array
+			Point to compare against.
+
+		Returns
+		-------
+		dist - Float
+			The mahalanobis distance between x1 and x2.
+		"""
+		diff = x1 - x2
+		diff /= self.eigenvalues
+		return la.norm(diff)
 	def getReconstruction(self, x):
 		"""Projects x onto the PCA space and gets the reconstruction.
 		Parameters
