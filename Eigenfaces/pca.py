@@ -10,6 +10,8 @@ class Pca:
 	"""Build a space based on the principle components of some data.
 	Class Members
 	-------------
+	meanVect - numpy array/vector
+		Mean vector of the training data.
 	eigenvectors - 2D numpy array
 		Eigenvectors that represent the principle components.
 	eigenvalues - numpy array
@@ -20,7 +22,7 @@ class Pca:
 		Parameters
 		----------
 		training - 2D numpy array
-			PUT DESCRIPTION OF PARAMETER HERE. IE: should shape be [sample, feature], or [feature, sample].
+			Training data in the shape of [feature, sample].
 		keep - Clamped Float range=[0.0, 1.0]
 			The amount of information/variance to keep.
 		"""
