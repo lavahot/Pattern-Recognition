@@ -14,6 +14,7 @@ d = h * w
 n = len(trainingFiles)
 
 # Load images
+print('Loading training data')
 trainingVects = np.empty((d, n), dtype='float')
 for i in range(n):
 	img = readImage(trainingFiles[i])
@@ -26,11 +27,11 @@ pca = Pca(trainingFiles, 1.0)
 # Test mean face
 meanFace = devectorizeImage(pca.meanVect, w, h)
 plt.title('Mean Face')
-plt.imshow(meanFace)
+plt.imshow(meanFace, cmap='gray')
 plt.show()
 
 # Test first eigenface
 eigenFace = devectorizeImage(pca.eigenVects[:, 0], w, h)
 plt.title('Eigen Face')
-plt.imshow(eigenFace)
+plt.imshow(eigenFace, cmap='gray')
 plt.show()
