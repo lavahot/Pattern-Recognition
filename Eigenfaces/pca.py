@@ -17,7 +17,8 @@ class Pca:
 	eigenvalues - numpy array
 		The eigenvalues corresponding to the eigenvectors.
 	"""
-	def __init__(self, training, keep):
+
+	def __init__(self, training, keep=0.9):
 		"""Initialize a PCA space based on the training data.
 		Parameters
 		----------
@@ -26,7 +27,40 @@ class Pca:
 		keep - Clamped Float range=[0.0, 1.0]
 			The amount of information/variance to keep.
 		"""
-		pass
+		# Get dimensionality
+		self.dim = len(training[0])
+		# Step 1: Get mean sample
+		self.meansample = np.zeros(d)
+		for d in range(self.dim):
+			for i in len(training):
+				self.meansample[d] += float(training[d][i])
+			self.meansample[d] /= float(len(training))
+
+		# Step 2: get distance from mean. 
+		self.theta = np.zeros(len(training),self.dim)
+		for i in range(len(training)):
+			self.theta[i] = training[i] - self.meansample
+
+		# Step 3: get sample covariance matrix, C
+		self.C = self.theta.dot(self.theta.transpose()) / len(training)
+
+		# Step 4: get sorted eigenvalues of C
+		# Step 5: get eigenvectors of C
+		self.eigenvalues, self.eigenvectors = la.eigh(self.theta)
+		self.eigensort = eigenvectors.argsort()
+		
+		# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
+		# self.besteigen = self.eigensort[math.floor(-keep*len(training))]
+		
+		# Find K
+		sumk = self.eigenvalues.sum()
+		for i in range(len(training)):
+			if self.eigenvalues[self.eigensort[:i]].sum() / sumk > keep:
+				self.k = i
+				break
+
+			
+
 	def project(self, x):
 		"""Find the projection of x onto the PCA space.
 		Parameters
@@ -39,7 +73,10 @@ class Pca:
 		y - Numpy vector/array
 			Projection of x onto the PCA space.
 		"""
-		pass
+
+		return self.eigenvectors[self.eigensort[:self.k]].transpose().dot(x - self.meansample)
+		
+
 	def reproject(self, y):
 		"""Find the reprojection of y from the PCA space.
 		Parameters
@@ -52,7 +89,8 @@ class Pca:
 		x - Numpy vector/array
 			Reconstruction based on y.
 		"""
-		pass
+		return np.cross(self.project(x),self.eigenvectors[self.eigensort[:self.k]]) + self.meansample 
+
 	def getMahalanobisDist(self, x1, x2):
 		"""Find the mahalanobis distance between x1 and x2 in the pca space.
 		Parameters
@@ -70,6 +108,7 @@ class Pca:
 		diff = x1 - x2
 		diff /= self.eigenvalues
 		return la.norm(diff)
+
 	def getReconstruction(self, x):
 		"""Projects x onto the PCA space and gets the reconstruction.
 		Parameters
@@ -83,6 +122,7 @@ class Pca:
 			Output feature vector.
 		"""
 		return self.reproject(self.project(x))
+	
 	def getReconstructionError(self, x):
 		"""Finds the reconstruction error caused by projecting x onto the PCA space.
 		Parameters
