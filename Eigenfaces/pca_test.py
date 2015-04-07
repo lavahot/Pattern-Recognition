@@ -22,7 +22,7 @@ for i in range(n):
 	trainingVects[:, i] = x
 
 # PCA
-pca = Pca(trainingFiles, 1.0)
+pca = Pca(trainingVects, 1.0)
 
 # Test mean face
 meanFace = devectorizeImage(pca.meanVect, w, h)
