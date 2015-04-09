@@ -22,6 +22,7 @@ for i in range(n):
 	trainingVects[:, i] = x
 
 # PCA
+print('Obtaining eigenfaces')
 pca = Pca(trainingVects, 1.0)
 
 # Test mean face
@@ -31,7 +32,8 @@ plt.imshow(meanFace, cmap='gray')
 plt.show()
 
 # Test first eigenface
-eigenFace = devectorizeImage(pca.eigenVects[:, 0], w, h)
-plt.title('Eigen Face')
-plt.imshow(eigenFace, cmap='gray')
-plt.show()
+for i in range(5, min(pca.eigenvalues.shape[0])):
+	eigenFace = devectorizeImage(pca.eigenVects[:, i], w, h)
+	plt.title('Eigen Face')
+	plt.imshow(eigenFace, cmap='gray')
+	plt.show()
