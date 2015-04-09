@@ -28,37 +28,45 @@ class Pca:
 			The amount of information/variance to keep.
 		"""
 		# Get dimensionality
-		self.dim = len(training[0])
-		# Step 1: Get mean sample
-		self.meansample = np.zeros(d)
-		for d in range(self.dim):
-			for i in len(training):
-				self.meansample[d] += float(training[d][i])
-			self.meansample[d] /= float(len(training))
+		nFeatures = training.shape[0]
+		nSamples = training.shape[1]
+		self.meanVect = np.empty(nFeatures)
+		for d in range(nFeatures):
+			self.meanVect[d] = training[d].mean()
 
 		# Step 2: get distance from mean. 
-		self.theta = np.zeros(len(training),self.dim)
-		for i in range(len(training)):
-			self.theta[i] = training[i] - self.meansample
+		theta = training.copy()
+		for d in range(nFeatures):
+			theta[d] -= self.meanVect[d]
 
 		# Step 3: get sample covariance matrix, C
-		self.C = self.theta.dot(self.theta.transpose()) / len(training)
+		C = theta.dot(theta.transpose()) / nSamples
 
 		# Step 4: get sorted eigenvalues of C
 		# Step 5: get eigenvectors of C
-		self.eigenvalues, self.eigenvectors = la.eigh(self.theta)
-		self.eigensort = eigenvectors.argsort()
+		eigenvalues, eigenvectors = la.eigh(C)
+		self.eigenvalues = np.empty(eigenvalues.shape)
+		self.eigenvectors = np.empty(eigenvectors.shape)
+		nComponents = self.eigenvalues.shape[0]
+		for i in range(nComponents//2):
+			j = nComponents - 1 - i
+			self.eigenvalues[i] = eigenvalues[j]
+			self.eigenvalues[j] = eigenvalues[i]
+			self.eigenvectors[:, i] = eigenVects[:, j]
+			self.eigenvectors[:, j] = eigenVects[:, i]
 		
 		# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
-		# self.besteigen = self.eigensort[math.floor(-keep*len(training))]
-		
 		# Find K
-		sumk = self.eigenvalues.sum()
-		for i in range(len(training)):
-			if self.eigenvalues[self.eigensort[:i]].sum() / sumk > keep:
-				self.k = i
+		totSum = self.eigenvalues.sum()
+		sumK = 0.0
+		k = 0
+		for i in range(nComponents):
+			sumK += self.eigenvalues[i]
+			k += 1
+			if sumK / totSum >= keep:
 				break
-
+		self.eigenvalues = self.eigenvalues[:k].copy()
+		self.eigenvectors = self.eigenVects[:, :k].copy()
 			
 
 	def project(self, x):
@@ -75,7 +83,7 @@ class Pca:
 		"""
 
 		return self.eigenvectors[self.eigensort[:self.k]].transpose().dot(x - self.meansample)
-		
+
 
 	def reproject(self, y):
 		"""Find the reprojection of y from the PCA space.
