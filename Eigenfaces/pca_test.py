@@ -32,8 +32,8 @@ plt.imshow(meanFace, cmap='gray')
 plt.show()
 
 # Test first eigenface
-for i in range(5, min(pca.eigenvalues.shape[0])):
-	eigenFace = devectorizeImage(pca.eigenVects[:, i], w, h)
+for i in range(min(5, pca.eigenvalues.shape[0])):
+	eigenFace = devectorizeImage(pca.eigenvectors[:, i], w, h)
 	plt.title('Eigen Face')
 	plt.imshow(eigenFace, cmap='gray')
 	plt.show()

@@ -52,8 +52,8 @@ class Pca:
 			j = nComponents - 1 - i
 			self.eigenvalues[i] = eigenvalues[j]
 			self.eigenvalues[j] = eigenvalues[i]
-			self.eigenvectors[:, i] = eigenVects[:, j]
-			self.eigenvectors[:, j] = eigenVects[:, i]
+			self.eigenvectors[:, i] = eigenvectors[:, j]
+			self.eigenvectors[:, j] = eigenvectors[:, i]
 		
 		# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
 		# Find K
@@ -66,7 +66,7 @@ class Pca:
 			if sumK / totSum >= keep:
 				break
 		self.eigenvalues = self.eigenvalues[:k].copy()
-		self.eigenvectors = self.eigenVects[:, :k].copy()
+		self.eigenvectors = self.eigenvectors[:, :k].copy()
 			
 
 	def project(self, x):
