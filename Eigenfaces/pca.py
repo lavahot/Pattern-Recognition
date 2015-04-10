@@ -28,33 +28,42 @@ class Pca:
 			The amount of information/variance to keep.
 		"""
 		# Get dimensionality
-		self.dim = len(training[0])
+		self.dim = len(training)
 		# Step 1: Get mean sample
-		self.meansample = np.zeros(d)
+		print "Getting mean vector."
+		self.meanVect = np.zeros(self.dim)
 		for d in range(self.dim):
-			for i in len(training):
-				self.meansample[d] += float(training[d][i])
-			self.meansample[d] /= float(len(training))
+			for i in range(len(training[0])):
+				self.meanVect[d] += float(training[d,i])
+			self.meanVect[d] /= float(len(training[:, 0]))
 
 		# Step 2: get distance from mean. 
-		self.theta = np.zeros(len(training),self.dim)
-		for i in range(len(training)):
-			self.theta[i] = training[i] - self.meansample
+		print "Getting mean distance matrix."
+		self.theta = np.zeros((self.dim, len(training[0])))
+		for i in range(len(training[0])):
+			self.theta[:, i] = training[:, i] - self.meanVect
+
+		# print "This is matrix A:\n", self.theta
+		# print self.theta.size, training.size
 
 		# Step 3: get sample covariance matrix, C
-		self.C = self.theta.dot(self.theta.transpose()) / len(training)
+		print "Getting mean distance matrix covariance."
+		self.C = self.theta.dot(self.theta.transpose()) / len(training[0])
 
 		# Step 4: get sorted eigenvalues of C
 		# Step 5: get eigenvectors of C
-		self.eigenvalues, self.eigenvectors = la.eigh(self.theta)
-		self.eigensort = eigenvectors.argsort()
+		print "Getting eigenvalues and eigenvectors."
+		self.eigenvalues, self.eigenvectors = la.eigh(self.C)
+		print "Sorting eigenvalues."
+		self.eigensort = self.eigenvalues.argsort()[::-1]
 		
 		# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
 		# self.besteigen = self.eigensort[math.floor(-keep*len(training))]
 		
 		# Find K
+		print "Finding best eigenvalues."
 		sumk = self.eigenvalues.sum()
-		for i in range(len(training)):
+		for i in range(len(training[0])):
 			if self.eigenvalues[self.eigensort[:i]].sum() / sumk > keep:
 				self.k = i
 				break
@@ -74,7 +83,7 @@ class Pca:
 			Projection of x onto the PCA space.
 		"""
 
-		return self.eigenvectors[self.eigensort[:self.k]].transpose().dot(x - self.meansample)
+		return self.eigenvectors[self.eigensort[:self.k]].transpose().dot(x - self.meanVect)
 		
 
 	def reproject(self, y):
@@ -89,7 +98,7 @@ class Pca:
 		x - Numpy vector/array
 			Reconstruction based on y.
 		"""
-		return np.cross(self.project(x),self.eigenvectors[self.eigensort[:self.k]]) + self.meansample 
+		return np.cross(self.project(x),self.eigenvectors[self.eigensort[:self.k]]) + self.meanVect 
 
 	def getMahalanobisDist(self, x1, x2):
 		"""Find the mahalanobis distance between x1 and x2 in the pca space.
