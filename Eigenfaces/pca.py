@@ -16,6 +16,8 @@ class Pca:
 		Eigenvectors that represent the principle components.
 	eigenvalues - numpy array
 		The eigenvalues corresponding to the eigenvectors.
+	k - integer
+		Number of eigenvectors kept.
 	"""
 
 	def __init__(self, training, keep=0.9):
@@ -40,11 +42,12 @@ class Pca:
 			theta[d] -= self.meanVect[d]
 
 		# Step 3: get sample covariance matrix, C
-		C = theta.dot(theta.transpose()) / nSamples
+		C = np.dot(theta.transpose(), theta) / nSamples
 
 		# Step 4: get sorted eigenvalues of C
 		# Step 5: get eigenvectors of C
 		eigenvalues, eigenvectors = la.eigh(C)
+		eigenvectors = np.dot(theta, eigenvectors)
 		self.eigenvalues = np.empty(eigenvalues.shape)
 		self.eigenvectors = np.empty(eigenvectors.shape)
 		nComponents = self.eigenvalues.shape[0]
@@ -65,9 +68,9 @@ class Pca:
 			k += 1
 			if sumK / totSum >= keep:
 				break
+		self.k = k
 		self.eigenvalues = self.eigenvalues[:k].copy()
 		self.eigenvectors = self.eigenvectors[:, :k].copy()
-		print(self.eigenvalues)
 	def project(self, x):
 		"""Find the projection of x onto the PCA space.
 		Parameters
@@ -80,7 +83,7 @@ class Pca:
 		y - Numpy vector/array
 			Projection of x onto the PCA space.
 		"""
-		return np.dot(x, self.eigenvectors)
+		return np.dot(x-self.meanVect, self.eigenvectors)
 
 	def reproject(self, y):
 		"""Find the reprojection of y from the PCA space.
@@ -94,7 +97,7 @@ class Pca:
 		x - Numpy vector/array
 			Reconstruction based on y.
 		"""
-		return np.dot(self.eigenvectors, y)
+		return np.dot(self.eigenvectors, y)+self.meanVect
 
 	def getMahalanobisDist(self, x1, x2):
 		"""Find the mahalanobis distance between x1 and x2 in the pca space.

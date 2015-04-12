@@ -41,7 +41,7 @@ plt.imshow(databaseVects[0].reshape([H, W]).astype('uint8'), cmap='gray', clim=[
 plt.show()
 
 # Get distance pairs
-queryDists = []
+queryDists = [] # [nQuery, nDatabase, 2]
 for i in range(nQuery):
 	dists = []
 	for j in range(nDatabase):
