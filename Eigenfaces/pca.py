@@ -49,18 +49,23 @@ class Pca:
 			# Step 3: get sample covariance matrix, C
 			print "Getting mean distance matrix covariance."
 			self.C = self.theta.dot(self.theta.transpose()) / len(training[0])
+			# print self.C.shape
 
 			# Step 4: get sorted eigenvalues of C
 			# Step 5: get eigenvectors of C
 			print "Getting eigenvalues and eigenvectors."
-			self.eigenvalues, self.eigenvectors = la.eigh(self.C)
+			self.eigenvalues, self.eigenvectors = la.eigh(self.theta.T.dot(self.theta))
 			print "Sorting eigenvalues."
 			self.eigensort = self.eigenvalues.argsort()[::-1]
-			self.eigenvalues = self.eigenvalues[self.eigensort].copy()
-			self.eigenvectors = self.eigenvectors[self.eigensort].copy()
-			
+			print "Here are the top eigen values"
+			self.eigenvalues = self.eigenvalues[self.eigensort[:self.dim]].copy()
+			print self.eigenvalues.shape
+			self.eigenvectors = self.theta.dot(self.eigenvectors).copy()
+			print self.eigenvectors.shape
+
+
 			# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
-			# self.besteigen = self.eigensort[math.floor(-keep*len(training))]
+			# self.besteigen = self.eigensort[math.floor(-keep*len(training) )]
 			
 			# Find K
 			print "Finding best eigenvalues."
@@ -84,7 +89,7 @@ class Pca:
 	def load(cls, loadfolder):
 		return cls(loadfolder=loadfolder)
 
-	def project(self, x):
+	def project(self, x, eignum=None):
 		"""Find the projection of x onto the PCA space.
 		Parameters
 		----------
@@ -96,10 +101,12 @@ class Pca:
 		y - Numpy vector/array
 			Projection of x onto the PCA space.
 		"""
-		return self.eigenvectors[:self.k].dot(np.vstack(x - self.meanVect))
+		if eignum == None:
+			eignum = self.k
+		return self.eigenvectors[:eignum].dot(np.vstack(x - self.meanVect))
 		
 
-	def reproject(self, y, eignum=self.k):
+	def reproject(self, y, eignum=None):
 		"""Find the reprojection of y from the PCA space.
 		Parameters
 		----------
@@ -111,6 +118,8 @@ class Pca:
 		x - Numpy vector/array
 			Reconstruction based on y.
 		"""
+		if eignum == None:
+			eignum = self.k
 		return np.cross(self.project(x),self.eigenvectors[:eignum]) + self.meanVect 
 
 	def getMahalanobisDist(self, x1, x2):
