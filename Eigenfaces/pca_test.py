@@ -59,11 +59,12 @@ if mode == 'R':
 		writeImage("ef_" + res + "/ef" + str(i) + ".pgm", eigenFace)
 
 	# Calculate the coefficeints of projection for the test set.
+	print "Saving projection coefficients."
 	copf = "ef_" + res + "/cop.txt"
-	cop = np.empty(pca.dim)
+	cop = []
 	for i in trainingVects[:, pca.eigensort]:
-		cop[i] = pca.project(i)	
-	np.savetxt(copf, cop)
+		cop.append(pca.project(i))	
+	np.savetxt(copf, np.vstack(cop))
 
 elif mode == 'E':
 	# Read in values from files
