@@ -4,7 +4,8 @@ import numpy.linalg as la
 import matplotlib.pyplot as plt
 
 # Max Rank
-MAX_RANK = 200
+MAX_RANK = 50
+W, H = 16, 20
 
 # Images
 databaseFiles = glob.glob('fa_H/*.pgm')
@@ -21,9 +22,10 @@ def getId(fname):
 	return fname.split('_', 2)[0]
 
 def getVect(fname):
+	global W, H
 	img = PIL.Image.open(fname)
-	img = img.resize((4, 5))
-	img = np.array(img, dtype='float').reshape(20)
+	img = img.resize((W, H))
+	img = np.array(img, dtype='float').reshape(W * H)
 	return img
 
 # Load images and ids
@@ -36,7 +38,7 @@ queryVects = list(map(getVect, queryFiles))
 
 # Show a face
 plt.title('Reduced Image')
-plt.imshow(databaseVects[0].reshape([5, 4]).astype('uint8'), cmap='gray', clim=[0, 255]).set_interpolation('nearest')
+plt.imshow(databaseVects[0].reshape([H, W]).astype('uint8'), cmap='gray', clim=[0, 255]).set_interpolation('nearest')
 plt.show()
 
 # Get distance pairs
