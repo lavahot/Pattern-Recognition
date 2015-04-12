@@ -111,8 +111,9 @@ class Pca:
 			The mahalanobis distance between x1 and x2.
 		"""
 		diff = x1 - x2
+		diff = diff ** 2
 		diff /= self.eigenvalues
-		return la.norm(diff)
+		return math.sqrt(diff.sum())
 
 	def getReconstruction(self, x):
 		"""Projects x onto the PCA space and gets the reconstruction.
