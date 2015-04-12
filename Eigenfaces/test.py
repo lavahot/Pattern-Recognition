@@ -51,6 +51,7 @@ for i in range(nTesting):
 # Check proper reconstruction
 x = testingVects[:, 0].copy()
 x = pca.getReconstruction(x)
+plt.title(testingFiles[0])
 plt.imshow(img.reshape([h, w]), cmap='gray')
 plt.show()
 

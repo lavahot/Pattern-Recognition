@@ -46,17 +46,14 @@ class Pca:
 
 		# Step 4: get sorted eigenvalues of C
 		# Step 5: get eigenvectors of C
-		eigenvalues, eigenvectors = la.eigh(C)
-		eigenvectors = np.dot(theta, eigenvectors)
-		self.eigenvalues = np.empty(eigenvalues.shape)
-		self.eigenvectors = np.empty(eigenvectors.shape)
+		self.eigenvalues, self.eigenvectors = la.eigh(C)
+		self.eigenvectors = np.dot(theta, self.eigenvectors)
+		self.eigenvalues = self.eigenvalues[::-1].copy()
+		self.eigenvectors = self.eigenvectors[:, ::-1].copy()
 		nComponents = self.eigenvalues.shape[0]
-		for i in range(nComponents//2):
-			j = nComponents - 1 - i
-			self.eigenvalues[i] = eigenvalues[j]
-			self.eigenvalues[j] = eigenvalues[i]
-			self.eigenvectors[:, i] = eigenvectors[:, j]
-			self.eigenvectors[:, j] = eigenvectors[:, i]
+		# Normalize to unit length 1
+		for i in range(nComponents):
+			self.eigenvectors[:, i] /= la.norm(self.eigenvectors[:, i])
 
 		# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
 		# Find K

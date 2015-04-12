@@ -6,6 +6,7 @@ import numpy as np
 import pickle
 
 # Get training
+VAR_KEEP = 0.95
 trainingFiles = glob.glob('fa_H/*.pgm')
 
 # Get the ids
@@ -31,7 +32,7 @@ for i in range(n):
 
 # Apply PCA
 print('Obtaining eigenfaces')
-pca = Pca(trainingVects, 0.8)
+pca = Pca(trainingVects, VAR_KEEP)
 
 # Test reprojection
 #x = pca.getReconstruction(trainingVects[:, 0])
