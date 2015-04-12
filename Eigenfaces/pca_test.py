@@ -76,7 +76,13 @@ if mode == 'R':
 	# count the number of correct matches and divide it by the total number of images in the test set to report the id accuracy.
 	# Draw the Cumulative Match Characteristic curve against N varying 1 to 50
 
-	# A3: Assuming N
+	# A3: Assuming N=1 show 3 query images which are correctly matched,
+	# along with the corresponding best matched samples.
+
+	# A4: Assuming N=1, show 3 query images which are incorrectly matched,
+	# along with the corresponding mismatched samples.
+
+	# Repeat A2 - A4 by keeping top eigenvectors corresponding to 90 and 95% of the information in the data. Plot the CMC curves on the same graph for comparison purposes. If there are significant differences in terms of identification accuracy in a2 and a5, try to explain why. If there are no significant differences, explain why too. 
 
 
 elif mode == 'E':

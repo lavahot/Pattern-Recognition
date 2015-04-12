@@ -35,9 +35,7 @@ class Pca:
 			print "Getting mean vector."
 			self.meanVect = np.zeros(self.dim)
 			for d in range(self.dim):
-				for i in range(len(training[0])):
-					self.meanVect[d] += float(training[d, i])
-				self.meanVect[d] /= float(len(training[:, 0]))
+				self.meanVect[d] = float(training[d].mean())
 
 			# Step 2: get distance from mean. 
 			print "Getting mean distance matrix."
@@ -133,7 +131,7 @@ class Pca:
 		diff /= self.eigenvalues
 		return la.norm(diff)
 
-	def getReconstruction(self, x, ):
+	def getReconstruction(self, x):
 		"""Projects x onto the PCA space and gets the reconstruction.
 		Parameters
 		----------
@@ -145,7 +143,7 @@ class Pca:
 		y - Numpy vector/array
 			Output feature vector.
 		"""
-		return self.reproject(self.project(x, ))
+		return self.reproject(self.project(x))
 	
 	def getReconstructionError(self, x):
 		"""Finds the reconstruction error caused by projecting x onto the PCA space.
