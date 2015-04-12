@@ -58,6 +58,8 @@ class Pca:
 			self.eigenvalues, self.eigenvectors = la.eigh(self.C)
 			print "Sorting eigenvalues."
 			self.eigensort = self.eigenvalues.argsort()[::-1]
+			self.eigenvalues = self.eigenvalues[self.eigensort].copy()
+			self.eigenvectors = self.eigenvectors[self.eigensort].copy()
 			
 			# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
 			# self.besteigen = self.eigensort[math.floor(-keep*len(training))]
@@ -66,7 +68,7 @@ class Pca:
 			print "Finding best eigenvalues."
 			sumk = self.eigenvalues.sum()
 			for i in range(len(training[0])):
-				if self.eigenvalues[self.eigensort[:i]].sum() / sumk > keep:
+				if self.eigenvalues[:i].sum() / sumk > keep:
 					self.k = i
 					break
 		else:
@@ -96,10 +98,10 @@ class Pca:
 		y - Numpy vector/array
 			Projection of x onto the PCA space.
 		"""
-		return self.eigenvectors[self.eigensort[:self.k]].dot(np.vstack(x - self.meanVect))
+		return self.eigenvectors[:self.k].dot(np.vstack(x - self.meanVect))
 		
 
-	def reproject(self, y):
+	def reproject(self, y, eignum=self.k):
 		"""Find the reprojection of y from the PCA space.
 		Parameters
 		----------
@@ -111,7 +113,7 @@ class Pca:
 		x - Numpy vector/array
 			Reconstruction based on y.
 		"""
-		return np.cross(self.project(x),self.eigenvectors[self.eigensort[:self.k]]) + self.meanVect 
+		return np.cross(self.project(x),self.eigenvectors[:eignum]) + self.meanVect 
 
 	def getMahalanobisDist(self, x1, x2):
 		"""Find the mahalanobis distance between x1 and x2 in the pca space.
@@ -131,7 +133,7 @@ class Pca:
 		diff /= self.eigenvalues
 		return la.norm(diff)
 
-	def getReconstruction(self, x):
+	def getReconstruction(self, x, ):
 		"""Projects x onto the PCA space and gets the reconstruction.
 		Parameters
 		----------
@@ -143,7 +145,7 @@ class Pca:
 		y - Numpy vector/array
 			Output feature vector.
 		"""
-		return self.reproject(self.project(x))
+		return self.reproject(self.project(x, ))
 	
 	def getReconstructionError(self, x):
 		"""Finds the reconstruction error caused by projecting x onto the PCA space.

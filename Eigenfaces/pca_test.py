@@ -37,7 +37,7 @@ if mode == 'R':
 
 	# Save eigenvalues
 	evf = open("ef_" + res + "/eigvals.txt", 'w')
-	for i in pca.eigenvalues[pca.eigensort[:pca.k]]:		
+	for i in pca.eigenvalues[:pca.k]:		
 		evf.write("%s\n" % i)
 	evf.close()
 
@@ -50,9 +50,9 @@ if mode == 'R':
 	writeImage("ef_" + res + "/mean.pgm", meanFace)
 
 	# Display and save K eigenfaces
-	print "Showing " + str(pca.k) + " Eigenfaces out of " + str(len(pca.eigenvalues)) + "."
+	print "Showing " + str(pca.k) + " eigenfaces out of " + str(len(pca.eigenvalues)) + "."
 	for i in range(pca.k):
-		eigenFace = devectorizeImage(pca.eigenvectors[:, pca.eigensort[i]], w, h)
+		eigenFace = devectorizeImage(pca.eigenvectors[:, i], w, h)
 		plt.title('Eigen Face ' + str(i+1))
 		plt.imshow(eigenFace, cmap='gray')
 		plt.show()
@@ -65,6 +65,19 @@ if mode == 'R':
 	for i in trainingVects[:, pca.eigensort]:
 		cop.append(pca.project(i))	
 	np.savetxt(copf, np.vstack(cop))
+
+	# For experiment A1 save the mean face, and the top and bottom 10 eigenfaces.
+
+	# For experiment A2 get eigen faces for 80% information retention.
+	# Get eigen-coefficient vectors for all testing and training images
+	# get mahalanobis distance for every pair of training and query images.
+	# chose top N face gallery images having highest similarity score with the query face.
+	# if query image is among the most N most similar faces, it is considered a correct match. What does this mean? Why would I match one face from one data set with the same face from the same dataset?
+	# count the number of correct matches and divide it by the total number of images in the test set to report the id accuracy.
+	# Draw the Cumulative Match Characteristic curve against N varying 1 to 50
+
+	# A3: Assuming N
+
 
 elif mode == 'E':
 	# Read in values from files
@@ -79,6 +92,8 @@ elif mode == 'E':
 			if (copv-j < errc):
 				errc = abs(copv-j)
 				copb = j
+
+
 	
 
 else :
