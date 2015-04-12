@@ -5,73 +5,79 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pickle
 
-# Get training
 VAR_KEEP = 0.95
-trainingFiles = glob.glob('fa_H/*.pgm')
 
-# Get the ids
-def getId(fname):
-	for delim in ['/', '\\']:
-		fname = fname.rsplit(delim, 2)[-1]
-	return int(fname.split('_', 2)[0])
-trainingIds = list(map(getId, trainingFiles))
-trainingIds = np.array(trainingIds, dtype='int')
 
-# Get dimension info
-h, w = readImage(trainingFiles[0]).shape
-d = h * w
-n = len(trainingFiles)
+def train(varKeep=VAR_KEEP):
+	# Get training
+	trainingFiles = glob.glob('fa_H/*.pgm')
 
-# Load testing images
-print('Loading training data')
-trainingVects = np.empty((d, n), dtype='float')
-for i in range(n):
-	img = readImage(trainingFiles[i])
-	x = vectorizeImage(img)
-	trainingVects[:, i] = x
+	# Get the ids
+	def getId(fname):
+		for delim in ['/', '\\']:
+			fname = fname.rsplit(delim, 2)[-1]
+		return int(fname.split('_', 2)[0])
+	trainingIds = list(map(getId, trainingFiles))
+	trainingIds = np.array(trainingIds, dtype='int')
 
-# Apply PCA
-print('Obtaining eigenfaces')
-pca = Pca(trainingVects, VAR_KEEP)
+	# Get dimension info
+	h, w = readImage(trainingFiles[0]).shape
+	d = h * w
+	n = len(trainingFiles)
 
-# Test reprojection
-#x = pca.getReconstruction(trainingVects[:, 0])
-#plt.imshow(x.reshape([h, w]), cmap='gray')
-#plt.show()
+	# Load testing images
+	print('Loading training data')
+	trainingVects = np.empty((d, n), dtype='float')
+	for i in range(n):
+		img = readImage(trainingFiles[i])
+		x = vectorizeImage(img)
+		trainingVects[:, i] = x
 
-# Write images to file
-print('training/mean.png')
-print('training/eigenFace(n).png')
-writeImage('training/mean.png', devectorizeImage(pca.meanVect, w, h))
-for i in range(10):
-	eigenFace = devectorizeImage(pca.eigenvectors[:, i].copy(), w, h)
-	eigenFace -= eigenFace.min()
-	eigenFace *= 255.0 / (eigenFace.max())
-	destFile = 'training/eigenFace{n}.png'.format(n=i)
-	writeImage(destFile,
-	           eigenFace)
+	# Apply PCA
+	print('Obtaining eigenfaces')
+	pca = Pca(trainingVects, varKeep)
 
-#for i in range(1, 11):
-#	eigenFace = devectorizeImage(pca.eigenvectors[:, -i].copy(), w, h)
-#	eigenFace -= eigenFace.min()
-#	eigenFace *= 255.0 / (eigenFace.max())
-#	destFile = 'training/worstEigenFace{n}.png'.format(n=i-1)
-#	writeImage(destFile,
-#	           eigenFace)
+	# Test reprojection
+	#x = pca.getReconstruction(trainingVects[:, 0])
+	#plt.imshow(x.reshape([h, w]), cmap='gray')
+	#plt.show()
 
-# Store items to file
-np.savetxt('training/eigenvalues.txt', pca.eigenvalues)
-np.savetxt('training/eigenvectors.txt', pca.eigenvectors)
-np.savetxt('training/ids.txt', trainingIds)
+	# Write images to file
+	print('training/mean.png')
+	print('training/eigenFace(n).png')
+	writeImage('training/mean.png', devectorizeImage(pca.meanVect, w, h))
+	for i in range(10):
+		eigenFace = devectorizeImage(pca.eigenvectors[:, i].copy(), w, h)
+		eigenFace -= eigenFace.min()
+		eigenFace *= 255.0 / (eigenFace.max())
+		destFile = 'training/eigenFace{n}.png'.format(n=i)
+		writeImage(destFile,
+		           eigenFace)
 
-# Project training images to eigenspace
-print('Projecting faces')
-k = pca.k
-trainingProjection = np.empty([k, n])
-for i in range(n):
-	x = trainingVects[:, i].copy()
-	y = pca.project(x)
-	trainingProjection[:, i] = y
-np.savetxt('training/projection.txt', trainingProjection)
+	#for i in range(1, 11):
+	#	eigenFace = devectorizeImage(pca.eigenvectors[:, -i].copy(), w, h)
+	#	eigenFace -= eigenFace.min()
+	#	eigenFace *= 255.0 / (eigenFace.max())
+	#	destFile = 'training/worstEigenFace{n}.png'.format(n=i-1)
+	#	writeImage(destFile,
+	#	           eigenFace)
 
-pickle.dump(pca, open('training/pca.pkl', 'wb'))
+	# Store items to file
+	np.savetxt('training/eigenvalues.txt', pca.eigenvalues)
+	np.savetxt('training/eigenvectors.txt', pca.eigenvectors)
+	np.savetxt('training/ids.txt', trainingIds)
+
+	# Project training images to eigenspace
+	print('Projecting faces')
+	k = pca.k
+	trainingProjection = np.empty([k, n])
+	for i in range(n):
+		x = trainingVects[:, i].copy()
+		y = pca.project(x)
+		trainingProjection[:, i] = y
+	np.savetxt('training/projection.txt', trainingProjection)
+
+	pickle.dump(pca, open('training/pca.pkl', 'wb'))
+
+if __name__ == '__main__':
+	train()
