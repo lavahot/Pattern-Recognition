@@ -54,7 +54,7 @@ class Pca:
 			self.eigenvalues[j] = eigenvalues[i]
 			self.eigenvectors[:, i] = eigenvectors[:, j]
 			self.eigenvectors[:, j] = eigenvectors[:, i]
-		
+
 		# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
 		# Find K
 		totSum = self.eigenvalues.sum()
@@ -67,8 +67,7 @@ class Pca:
 				break
 		self.eigenvalues = self.eigenvalues[:k].copy()
 		self.eigenvectors = self.eigenvectors[:, :k].copy()
-			
-
+		print(self.eigenvalues)
 	def project(self, x):
 		"""Find the projection of x onto the PCA space.
 		Parameters
@@ -81,9 +80,7 @@ class Pca:
 		y - Numpy vector/array
 			Projection of x onto the PCA space.
 		"""
-
-		return self.eigenvectors[self.eigensort[:self.k]].transpose().dot(x - self.meansample)
-
+		return np.dot(x, self.eigenvectors)
 
 	def reproject(self, y):
 		"""Find the reprojection of y from the PCA space.
@@ -97,7 +94,7 @@ class Pca:
 		x - Numpy vector/array
 			Reconstruction based on y.
 		"""
-		return np.cross(self.project(x),self.eigenvectors[self.eigensort[:self.k]]) + self.meansample 
+		return np.dot(self.eigenvectors, y)
 
 	def getMahalanobisDist(self, x1, x2):
 		"""Find the mahalanobis distance between x1 and x2 in the pca space.
@@ -130,7 +127,7 @@ class Pca:
 			Output feature vector.
 		"""
 		return self.reproject(self.project(x))
-	
+
 	def getReconstructionError(self, x):
 		"""Finds the reconstruction error caused by projecting x onto the PCA space.
 		Parameters
