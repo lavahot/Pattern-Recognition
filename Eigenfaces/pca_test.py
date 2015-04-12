@@ -62,7 +62,8 @@ if mode == 'R':
 	print "Saving projection coefficients."
 	copf = "ef_" + res + "/cop.txt"
 	cop = []
-	for i in trainingVects[:, pca.eigensort]:
+	for i in trainingVects.T:
+		# print i.shape
 		cop.append(pca.project(i))	
 	np.savetxt(copf, np.vstack(cop))
 
@@ -91,7 +92,7 @@ elif mode == 'E':
 	n = len(testingFiles)
 	cop = np.loadtxt("ef_" + res + "/cop.txt")
 	# Generate projection coeffs for test files
-	for i in testingVects: 
+	for i in testingVects.T: 
 		copv = pca.project(i)
 		errc = 1000
 		for j in cop:

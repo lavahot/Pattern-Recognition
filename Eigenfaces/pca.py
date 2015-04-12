@@ -49,7 +49,6 @@ class Pca:
 			# Step 3: get sample covariance matrix, C
 			print "Getting mean distance matrix covariance."
 			self.C = self.theta.dot(self.theta.transpose()) / len(training[0])
-			# print self.C.shape
 
 			# Step 4: get sorted eigenvalues of C
 			# Step 5: get eigenvectors of C
@@ -57,11 +56,8 @@ class Pca:
 			self.eigenvalues, self.eigenvectors = la.eigh(self.theta.T.dot(self.theta)/len(training[0]))
 			print "Sorting eigenvalues."
 			self.eigensort = self.eigenvalues.argsort()[::-1]
-			print "Here are the top eigen values"
 			self.eigenvalues = self.eigenvalues[self.eigensort[:self.dim]]
-			print self.eigenvalues.shape
 			self.eigenvectors = self.theta.dot(self.eigenvectors)[:,self.eigensort[:self.dim]]
-			print self.eigenvectors.shape
 
 
 			# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
@@ -103,7 +99,7 @@ class Pca:
 		"""
 		if eignum == None:
 			eignum = self.k
-		return self.eigenvectors[:eignum].dot(np.vstack(x - self.meanVect))
+		return self.eigenvectors[:, :eignum].T.dot(np.vstack(x - self.meanVect))
 		
 
 	def reproject(self, y, eignum=None):
