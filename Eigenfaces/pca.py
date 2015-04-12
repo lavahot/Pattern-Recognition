@@ -1,5 +1,6 @@
 import numpy as np
 import numpy.linalg as la
+from image_manipulation import *
 
 # TODO:
 #	Pca.__init__
@@ -18,7 +19,7 @@ class Pca:
 		The eigenvalues corresponding to the eigenvectors.
 	"""
 
-	def __init__(self, training, keep=0.9):
+	def __init__(self, training=np.zeros((1,1)), keep=0.9, loadfolder=""):
 		"""Initialize a PCA space based on the training data.
 		Parameters
 		----------
@@ -27,48 +28,61 @@ class Pca:
 		keep - Clamped Float range=[0.0, 1.0]
 			The amount of information/variance to keep.
 		"""
-		# Get dimensionality
-		self.dim = len(training)
-		# Step 1: Get mean sample
-		print "Getting mean vector."
-		self.meanVect = np.zeros(self.dim)
-		for d in range(self.dim):
+		if len(training[0]) > 1:
+			# Get dimensionality
+			self.dim = len(training)
+			# Step 1: Get mean sample
+			print "Getting mean vector."
+			self.meanVect = np.zeros(self.dim)
+			for d in range(self.dim):
+				for i in range(len(training[0])):
+					self.meanVect[d] += float(training[d, i])
+				self.meanVect[d] /= float(len(training[:, 0]))
+
+			# Step 2: get distance from mean. 
+			print "Getting mean distance matrix."
+			self.theta = np.zeros((self.dim, len(training[0])))
 			for i in range(len(training[0])):
-				self.meanVect[d] += float(training[d,i])
-			self.meanVect[d] /= float(len(training[:, 0]))
+				self.theta[:, i] = training[:, i] - self.meanVect
 
-		# Step 2: get distance from mean. 
-		print "Getting mean distance matrix."
-		self.theta = np.zeros((self.dim, len(training[0])))
-		for i in range(len(training[0])):
-			self.theta[:, i] = training[:, i] - self.meanVect
+			# print "This is matrix A:\n", self.theta
+			# print self.theta.size, training.size
 
-		# print "This is matrix A:\n", self.theta
-		# print self.theta.size, training.size
+			# Step 3: get sample covariance matrix, C
+			print "Getting mean distance matrix covariance."
+			self.C = self.theta.dot(self.theta.transpose()) / len(training[0])
 
-		# Step 3: get sample covariance matrix, C
-		print "Getting mean distance matrix covariance."
-		self.C = self.theta.dot(self.theta.transpose()) / len(training[0])
-
-		# Step 4: get sorted eigenvalues of C
-		# Step 5: get eigenvectors of C
-		print "Getting eigenvalues and eigenvectors."
-		self.eigenvalues, self.eigenvectors = la.eigh(self.C)
-		print "Sorting eigenvalues."
-		self.eigensort = self.eigenvalues.argsort()[::-1]
-		
-		# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
-		# self.besteigen = self.eigensort[math.floor(-keep*len(training))]
-		
-		# Find K
-		print "Finding best eigenvalues."
-		sumk = self.eigenvalues.sum()
-		for i in range(len(training[0])):
-			if self.eigenvalues[self.eigensort[:i]].sum() / sumk > keep:
-				self.k = i
-				break
-
+			# Step 4: get sorted eigenvalues of C
+			# Step 5: get eigenvectors of C
+			print "Getting eigenvalues and eigenvectors."
+			self.eigenvalues, self.eigenvectors = la.eigh(self.C)
+			print "Sorting eigenvalues."
+			self.eigensort = self.eigenvalues.argsort()[::-1]
 			
+			# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
+			# self.besteigen = self.eigensort[math.floor(-keep*len(training))]
+			
+			# Find K
+			print "Finding best eigenvalues."
+			sumk = self.eigenvalues.sum()
+			for i in range(len(training[0])):
+				if self.eigenvalues[self.eigensort[:i]].sum() / sumk > keep:
+					self.k = i
+					break
+		else:
+			with open(loadfolder + "/eigvals.txt") as evf:
+				self.eigenvalues = map(float, evf)
+			self.k = sum(1 for line in open(loadfolder + "/eigvals.txt"))
+			self.eigenvectors = []
+			for i in range(self.k):
+				self.eigenvectors[i] = readImage(loadfolder + "/ef" + i +".pgm")
+			self.meanVect = readImage(loadfolder + "/mean.pgm")
+			self.eigensort = np.arange(self.k)
+
+
+	@classmethod
+	def load(cls, loadfolder):
+		return cls(loadfolder)
 
 	def project(self, x):
 		"""Find the projection of x onto the PCA space.
@@ -82,8 +96,13 @@ class Pca:
 		y - Numpy vector/array
 			Projection of x onto the PCA space.
 		"""
-
-		return self.eigenvectors[self.eigensort[:self.k]].transpose().dot(x - self.meanVect)
+		# print self.eigenvectors[self.eigensort[:self.k]].transpose().shape
+		# print self.eigenvectors[self.eigensort[:self.k]].transpose()				
+		print np.vstack(x - self.meanVect).shape
+		# print np.vstack(x).shape
+		# print self.meanVect.shape
+		# print x - self.meanVect
+		return self.eigenvectors[self.eigensort[:self.k]].transpose().dot(np.vstack(x - self.meanVect).transpose())
 		
 
 	def reproject(self, y):
