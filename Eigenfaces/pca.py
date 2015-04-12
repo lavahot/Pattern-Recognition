@@ -54,13 +54,13 @@ class Pca:
 			# Step 4: get sorted eigenvalues of C
 			# Step 5: get eigenvectors of C
 			print "Getting eigenvalues and eigenvectors."
-			self.eigenvalues, self.eigenvectors = la.eigh(self.theta.T.dot(self.theta))
+			self.eigenvalues, self.eigenvectors = la.eigh(self.theta.T.dot(self.theta)/len(training[0]))
 			print "Sorting eigenvalues."
 			self.eigensort = self.eigenvalues.argsort()[::-1]
 			print "Here are the top eigen values"
-			self.eigenvalues = self.eigenvalues[self.eigensort[:self.dim]].copy()
+			self.eigenvalues = self.eigenvalues[self.eigensort[:self.dim]]
 			print self.eigenvalues.shape
-			self.eigenvectors = self.theta.dot(self.eigenvectors).copy()
+			self.eigenvectors = self.theta.dot(self.eigenvectors)[:,self.eigensort[:self.dim]]
 			print self.eigenvectors.shape
 
 
