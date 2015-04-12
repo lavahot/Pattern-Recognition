@@ -70,8 +70,7 @@ elif mode == 'E':
 	# Read in values from files
 	pca = Pca.load("ef_" + res)
 	n = len(testingFiles)
-	with open("ef_" + res + "/cop.txt", 'r+') as copf:
-		cop = map(float, copf)
+	cop = np.loadtxt("ef_" + res + "/cop.txt")
 	# Generate projection coeffs for test files
 	for i in testingVects: 
 		copv = pca.project(i)

@@ -96,7 +96,7 @@ class Pca:
 		y - Numpy vector/array
 			Projection of x onto the PCA space.
 		"""
-		return self.eigenvectors[self.eigensort[:self.k]].transpose().dot(np.vstack(x - self.meanVect).transpose())
+		return self.eigenvectors[self.eigensort[:self.k]].dot(np.vstack(x - self.meanVect))
 		
 
 	def reproject(self, y):
