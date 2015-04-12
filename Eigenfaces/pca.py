@@ -75,14 +75,14 @@ class Pca:
 			self.k = sum(1 for line in open(loadfolder + "/eigvals.txt"))
 			self.eigenvectors = []
 			for i in range(self.k):
-				self.eigenvectors[i] = readImage(loadfolder + "/ef" + i +".pgm")
+				self.eigenvectors.append(readImage(loadfolder + "/ef" + str(i) +".pgm"))
 			self.meanVect = readImage(loadfolder + "/mean.pgm")
 			self.eigensort = np.arange(self.k)
 
 
 	@classmethod
 	def load(cls, loadfolder):
-		return cls(loadfolder)
+		return cls(loadfolder=loadfolder)
 
 	def project(self, x):
 		"""Find the projection of x onto the PCA space.
