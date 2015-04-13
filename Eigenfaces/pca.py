@@ -20,7 +20,7 @@ class Pca:
 		Number of eigenvectors kept.
 	"""
 
-	def __init__(self, training, keep=0.9):
+	def __init__(self, training=np.zeros((1,1)), keep=0.9, loadfolder=""):
 		"""Initialize a PCA space based on the training data.
 		Parameters
 		----------
@@ -29,46 +29,65 @@ class Pca:
 		keep - Clamped Float range=[0.0, 1.0]
 			The amount of information/variance to keep.
 		"""
-		# Get dimensionality
-		nFeatures = training.shape[0]
-		nSamples = training.shape[1]
-		self.meanVect = np.empty(nFeatures)
-		for d in range(nFeatures):
-			self.meanVect[d] = training[d].mean()
+		if len(training[0]) > 1:		
+			# Get dimensionality
+			nFeatures = training.shape[0]
+			nSamples = training.shape[1]
+			self.meanVect = np.empty(nFeatures)
+			for d in range(nFeatures):
+				self.meanVect[d] = training[d].mean()
 
-		# Step 2: get distance from mean. 
-		theta = training.copy()
-		for d in range(nFeatures):
-			theta[d] -= self.meanVect[d]
+			# Step 2: get distance from mean.
+			print "Getting mean distance matrix." 
+			theta = training.copy()
+			for d in range(nFeatures):
+				theta[d] -= self.meanVect[d]
 
-		# Step 3: get sample covariance matrix, C
-		C = np.dot(theta.transpose(), theta) / nSamples
+			# Step 3: get sample covariance matrix, C
+			print "Getting mean distance matrix covariance."
+			C = np.dot(theta.transpose(), theta) / nSamples
 
-		# Step 4: get sorted eigenvalues of C
-		# Step 5: get eigenvectors of C
-		self.eigenvalues, self.eigenvectors = la.eigh(C)
-		self.eigenvectors = np.dot(theta, self.eigenvectors)
-		self.eigenvalues = self.eigenvalues[::-1].copy()
-		self.eigenvectors = self.eigenvectors[:, ::-1].copy()
-		nComponents = self.eigenvalues.shape[0]
-		# Normalize to unit length 1
-		for i in range(nComponents):
-			self.eigenvectors[:, i] /= la.norm(self.eigenvectors[:, i])
+			# Step 4: get sorted eigenvalues of C
+			# Step 5: get eigenvectors of C
+			print "Getting eigenvalues and eigenvectors."
+			self.eigenvalues, self.eigenvectors = la.eigh(C)
+			print "Sorting eigenvalues."		
+			self.eigenvectors = np.dot(theta, self.eigenvectors)
+			self.eigenvalues = self.eigenvalues[::-1].copy()
+			self.eigenvectors = self.eigenvectors[:, ::-1].copy()
+			nComponents = self.eigenvalues.shape[0]
+			# Normalize to unit length 1
+			for i in range(nComponents):
+				self.eigenvectors[:, i] /= la.norm(self.eigenvectors[:, i])
 
-		# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
-		# Find K
-		totSum = self.eigenvalues.sum()
-		sumK = 0.0
-		k = 0
-		for i in range(nComponents):
-			sumK += self.eigenvalues[i]
-			k += 1
-			if sumK / totSum >= keep:
-				break
-		self.k = k
-		self.eigenvalues = self.eigenvalues[:k].copy()
-		self.eigenvectors = self.eigenvectors[:, :k].copy()
-	def project(self, x):
+			# Step 6: Reduce dimensionality by keeping only the largest eigenvalues and corresponding eigenvectors.
+			# Find K
+			totSum = self.eigenvalues.sum()
+			sumK = 0.0
+			k = 0
+			for i in range(nComponents):
+				sumK += self.eigenvalues[i]
+				k += 1
+				if sumK / totSum >= keep:
+					break
+			self.k = k
+			self.eigenvalues = self.eigenvalues[:k].copy()
+			self.eigenvectors = self.eigenvectors[:, :k].copy()
+	else:
+			with open(loadfolder + "/eigvals.txt") as evf:
+				self.eigenvalues = map(float, evf)
+			self.k = sum(1 for line in open(loadfolder + "/eigvals.txt"))
+			self.eigenvectors = []
+			for i in range(self.k):
+				self.eigenvectors.append(readImage(loadfolder + "/ef" + str(i) +".pgm"))
+			self.meanVect = readImage(loadfolder + "/mean.pgm")
+			self.eigensort = np.arange(self.k)
+
+	@classmethod
+	def load(cls, loadfolder):
+		return cls(loadfolder=loadfolder)
+
+	def project(self, x, eignum=None):
 		"""Find the projection of x onto the PCA space.
 		Parameters
 		----------
@@ -80,7 +99,10 @@ class Pca:
 		y - Numpy vector/array
 			Projection of x onto the PCA space.
 		"""
-		return np.dot(x-self.meanVect, self.eigenvectors)
+		if eignum == None:
+			eignum = self.k
+		return self.eigenvectors[:, :eignum].T.dot(np.vstack(x - self.meanVect))
+		
 
 	def reproject(self, y):
 		"""Find the reprojection of y from the PCA space.
@@ -128,7 +150,7 @@ class Pca:
 			Output feature vector.
 		"""
 		return self.reproject(self.project(x))
-
+	
 	def getReconstructionError(self, x):
 		"""Finds the reconstruction error caused by projecting x onto the PCA space.
 		Parameters
