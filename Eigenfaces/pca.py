@@ -1,6 +1,5 @@
 import numpy as np
 import numpy.linalg as la
-from image_manipulation import *
 
 # TODO:
 #	Pca.__init__
